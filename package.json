@@ -1,0 +1,27 @@
+{
+    "name": "baackend-va",
+    "version": "1.0.0",
+    "description": "Servidor backend software Vidrios y aluminos VH",
+    "main": "index.js",
+    "scripts": {
+        "start": "nodemon ./bin/www",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Bryan Michel Villota",
+    "license": "ISC",
+    "dependencies": {
+        "bcryptjs": "^2.4.3",
+        "body-parser": "^1.18.2",
+        "express": "^4.16.3",
+        "express-fileupload": "^0.4.0",
+        "google-auth-library": "^1.5.0",
+        "jsonwebtoken": "^8.2.1",
+        "morgan": "^1.9.0",
+        "pg": "^7.4.3",
+        "pg-hstore": "^2.3.2",
+        "q": "^1.5.1",
+        "sequelize": "^4.37.7",
+        "sequelize-auto": "^0.4.29",
+        "sequelize-cli": "^4.0.0"
+    }
+}
