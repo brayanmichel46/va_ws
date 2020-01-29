@@ -51,6 +51,10 @@ module.exports = (sequelize, DataTypes) => {
         google: {
             type: DataTypes.BOOLEAN,
             allowNull: true
+        },
+        estado:{
+            type:DataTypes.CHAR(1),
+            allowNull:false
         }
     }, {
         tableName: 'seg_usuario',

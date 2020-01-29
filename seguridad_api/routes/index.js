@@ -27,6 +27,10 @@ app.post("/obtenerusuarios", mdAutenticacion.verificaToken, SegUsuarioController
 // =============================================
 app.post('/crearusuario', SegUsuarioController.create);
 // =============================================
+//  Crear un nuevo usuario web
+// =============================================
+app.post('/crearusuarioweb', SegUsuarioController.crearUsuarioWeb);
+// =============================================
 //  Actualizar usuario
 // =============================================
 app.post('/actualizarusuario', mdAutenticacion.verificaToken, SegUsuarioController.update);

@@ -58,8 +58,9 @@ function subirPorColeccion(coleccion, id, nombreArchivo, res) {
         case 'usuarios':
             SegUsuarioDao.findById(id).then(usuario => {
                 if (usuario) {
-                    var pathViejo = './uploads/' + [coleccion] + '/' + usuario.img;
+                    var pathViejo = '../../uploads/' + [coleccion] + '/' + usuario.img;
                     // si existe el archivo elimina la imagen anterior
+                    console.log("aqui",pathViejo);
                     if (fs.existsSync(pathViejo)) {
 
                         fs.unlink(pathViejo);
@@ -94,6 +95,7 @@ function subirPorColeccion(coleccion, id, nombreArchivo, res) {
                     });
                 }
             }).catch(error => {
+                console.log("error",error);
                 Respuesta.sendJsonResponse(res, 500, {
                     ok: false,
                     mensaje: 'Error al buscar el usuario',
@@ -194,9 +196,9 @@ function subirPorColeccion(coleccion, id, nombreArchivo, res) {
     }
 };
 var obtenerImgColeccion = (req, res) => {
-    console.log(req.body);
-    var coleccion = req.body.coleccion;
-    var img = req.body.img;
+    console.log(req.params);
+    var coleccion = req.params.coleccion;
+    var img = req.params.img;
 
     var path = `./uploads/${ coleccion }/${ img }`;
     fs.exists(path, existe => {

@@ -40,5 +40,5 @@ app.post('/busquedacoleccion', mdAutenticacion.verificaToken, busquedaController
 //  Rutas imagenes de colecciones
 // =============================================
 app.post('/upload', mdAutenticacion.verificaToken, UploadController.upload);
-app.post('/obtenerimgcoleccion', mdAutenticacion.verificaToken, UploadController.obtenerImgColeccion);
+app.get('/obtenerimgcoleccion/:coleccion/:img', mdAutenticacion.verificaToken, UploadController.obtenerImgColeccion);
 module.exports = app;

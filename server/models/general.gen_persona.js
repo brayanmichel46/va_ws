@@ -14,10 +14,6 @@ module.exports = (sequelize, DataTypes) => {
         nombre: {
             type: DataTypes.STRING,
             allowNull: false
-        },
-        img: {
-            type: DataTypes.STRING,
-            allowNull: true
         }
     }, {
         tableName: 'gen_persona',

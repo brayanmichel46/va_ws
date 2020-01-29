@@ -95,6 +95,7 @@ var createPersonaCliente = (persona, cliente) => {
 //  Funcion que permite crear una persona como usuario
 // =============================================
 var createPersonaUsuario = (persona, usuario) => {
+        usuario.password = bcrypt.hashSync(usuario.password, 10);
         var deferred = Q.defer();
         if (persona) {
             return sequelize.transaction({ autocommit: false }).then(function(t) {

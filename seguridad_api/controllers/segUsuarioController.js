@@ -1,6 +1,6 @@
 var Respuesta = require("../helpers/respuesta");
 var SegUsuarioDao = require("../dao/segUsuarioDao");
-var GenPersona = require("../../general_api/dao/genPersonaDao");
+var GenPersonaDao = require("../../general_api/dao/genPersonaDao");
 
 var bcrypt = require('bcryptjs');
 var jwt = require('jsonwebtoken');
@@ -74,36 +74,62 @@ var create = function(req, res) {
 //  Permite actualizar la informacion de un 
 //  usuario ya registrado
 // =============================================
-var update = (req, res) => {
+var update = async (req, res) => {
     var usuario = req.body;
-    SegUsuarioDao.findById(usuario.id_usuario).then((resultado) => {
-        if (!resultado) {
-            return Respuesta.sendJsonResponse(res, 400, {
+    console.log('usuario',usuario);
+    if(Object.keys(usuario).indexOf('email')>0){
+        await SegUsuarioDao.findByEmail(usuario.email).then((usuarioemail)=>{
+            //console.log("usuario",usuarioemail.dataValues);
+            if(usuarioemail){
+                return Respuesta.sendJsonResponse(res, 400, {
+                    ok: false,
+                    mensaje: 'El email ya esta en uso',
+                    erros: { message: 'Existe un usuario con este email' }
+                });
+            }
+
+        }).catch((error) => {
+            console.log("error",error)
+            Respuesta.sendJsonResponse(res, 500, {
                 ok: false,
-                mensaje: 'El usuario con el id ' + usuario.id_usuario + ' no existe',
-                erros: { message: 'No existe un usuario con ese ID' }
-            });
-        };
-        SegUsuarioDao.update(usuario).then((resultado) => {
-            Respuesta.sendJsonResponse(res, 200, {
-                ok: true,
-                mensaje: 'Usuario actualizado!',
-                usuario: resultado
+                mensaje: 'Error al buscar usuario!!!',
+                error: error
+            });    
+        })
+    }
+
+        SegUsuarioDao.findById(usuario.id_usuario).then((resultado) => {
+            if (!resultado) {
+                Respuesta.sendJsonResponse(res, 400, {
+                    ok: false,
+                    mensaje: 'El usuario con el id ' + usuario.id_usuario + ' no existe',
+                    erros: { message: 'No existe un usuario con ese ID' }
+                });
+            };
+            SegUsuarioDao.update(usuario).then((resultado) => {
+                console.log("esteess",resultado)
+                
+                Respuesta.sendJsonResponse(res, 200, {
+                    ok: true,
+                    mensaje: 'Usuario actualizado!',
+                    usuario: resultado
+                });
+            }).catch((error) => {
+                Respuesta.sendJsonResponse(res, 400, {
+                    ok: false,
+                    mensaje: 'Error al actualizar usuario',
+                    usuario: error
+                });
             });
         }).catch((error) => {
-            Respuesta.sendJsonResponse(res, 400, {
+            console.log(error)
+            Respuesta.sendJsonResponse(res, 500, {
                 ok: false,
-                mensaje: 'Error al actualizar usuario',
-                usuario: error
+                mensaje: 'Error al buscar usuario',
+                error: error
             });
-        });
-    }).catch((error) => {
-        Respuesta.sendJsonResponse(res, 500, {
-            ok: false,
-            mensaje: 'Error al buscar usuario',
-            error: error
-        });
-    })
+        })
+
 };
 // =============================================
 //  Permite eliminar un usuario
@@ -188,8 +214,10 @@ var loginGoogle = (req, res) => {
                     email: payload.email,
                     password: '=)',
                     img: payload.picture,
-                    google: true
+                    google: true,
+                    estado:'A'
                 };
+                console.log("AQuiiiii",payload.picture,payload);
                 GenPersona.createPersonaUsuario(persona, usuario).then(datos => {
                     usuario.password = '=)'
                     var token = jwt.sign({ usuario: usuario }, SEED, { expiresIn: 14400 })
@@ -203,6 +231,7 @@ var loginGoogle = (req, res) => {
                         token: token
                     });
                 }).catch(error => {
+                    console.log("error",error)
                     return Respuesta.sendJsonResponse(res, 500, {
                         ok: false,
                         mensaje: 'Error al crear usuario',
@@ -268,9 +297,52 @@ var login = (req, res) => {
         });
     })
 }
+
+// =============================================
+//  Permite crear un nuevo usuario desde la web
+// =============================================
+var crearUsuarioWeb = function(req, res) {
+    var personaC={
+        nombre:req.body.nombre,
+    }
+    var usuarioC={
+        email: req.body.email,
+        password: req.body.password,
+        img: 'no-img',
+        google: false,
+        estado:'A'
+    }
+
+    SegUsuarioDao.findByEmail(req.body.email).then((usuario) => {
+        if (usuario) {
+            return Respuesta.sendJsonResponse(res, 400, {
+                ok: false,
+                mensaje: 'Correo ya registrado para un usuario',
+                erros: { message: 'La persona ya tiene un usuario registrado asociado a ese correo' }
+            });
+        };
+        GenPersonaDao.createPersonaUsuario(personaC,usuarioC).then(function(resultado) {
+            Respuesta.sendJsonResponse(res, 201, {
+                ok: true,
+                mensaje: 'Usuario creado',
+                usuario: resultado
+            });
+        }).catch(function(error) {
+            Respuesta.sendJsonResponse(res, 400, {
+                ok: false,
+                mensaje: 'Error al crear el usuario',
+                errors: error
+            });
+        });
+       
+    });
+
+};
+
 module.exports.findAll = findAll;
 module.exports.create = create;
 module.exports.update = update;
 module.exports.delete = eliminar;
 module.exports.login = login;
 module.exports.loginGoogle = loginGoogle;
+module.exports.crearUsuarioWeb=crearUsuarioWeb;

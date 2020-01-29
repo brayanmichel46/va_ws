@@ -3,12 +3,25 @@ var sequelize = Models.sequelize;
 var bcrypt = require('bcryptjs');
 
 var Q = require("q");
-var findAll = function(desde) {
+var findAll = async function(desde) {
+    console.log("llega");
     limit = 5;
-    return Models.SegUsuario.findAll({
+    var usuarios= await Models.SegUsuario.findAll({
         offset: desde,
-        limit: 5
+        limit: 5,
+        include:[
+            {
+                model:Models.GenPersona,
+                attributes:['nombre']
+            }
+        ]
     });
+    await usuarios.forEach( async element => {
+        console.log(element.dataValues);
+        element.dataValues.nombre=element.dataValues.GenPersona.nombre;
+        delete element.dataValues.GenPersona;
+    });
+    return usuarios;
 };
 // =============================================
 // Funcion para crear un nuevo usuario
@@ -21,20 +34,42 @@ var create = function(usuario) {
 // Funcion que permite actualizar la informacion
 // de un usuario
 // =============================================
-var update = (usuario) => {
+var  update = async (usuario)  => {
+    console.log("uaudi",usuario)
     var objetoActualizar = {}
-    if (Object.keys(usuario).indexOf('email') >= 0) {
-        objetoActualizar.email = usuario.email
+    var usu= await findById(usuario.id_usuario);
+    
+    if (Object.keys(usuario).indexOf('nombre') >= 0) {
+        objetoActualizar.nombre = usuario.nombre
+        await Models.GenPersona.update(objetoActualizar, {
+            where: {
+                id_persona: usu.id_persona
+            }
+        });
     }
-    if (Object.keys(usuario).indexOf('img') >= 0) {
+
+    if (Object.keys(usuario).indexOf('img') >= 0 || Object.keys(usuario).indexOf('email') >= 0) {
         objetoActualizar.img = usuario.img
-    }
-    console.log("entro", objetoActualizar);
-    return Models.SegUsuario.update(objetoActualizar, {
-        where: {
-            id_usuario: usuario.id_usuario
+        if(Object.keys(usuario).indexOf('img') >= 0){
+            objetoActualizar.img = usuario.img
         }
-    });
+        if(Object.keys(usuario).indexOf('email') >= 0){
+            objetoActualizar.email = usuario.email
+        }
+        await Models.SegUsuario.update(objetoActualizar, {
+            where: {
+                id_usuario: usuario.id_usuario
+            }
+        });
+    }
+
+    
+    var usu= await findById(usuario.id_usuario);
+    usu.dataValues.nombre=usu.dataValues.GenPersona.nombre;
+    delete usu.dataValues.GenPersona;
+    return usu;
+    console.log("entro", objetoActualizar);
+    
 };
 // =============================================
 // Funcion que permite buscar un usuario por su id
@@ -43,7 +78,13 @@ var findById = (id_usuario) => {
     return Models.SegUsuario.find({
         where: {
             id_usuario: id_usuario
-        }
+        },
+        include:[
+            {
+                model:Models.GenPersona,
+                attributes:['nombre','identificacion']
+            }
+        ]
     });
 };
 // =============================================
