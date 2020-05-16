@@ -1,4 +1,4 @@
-var Respuesta = require("../../server/helpers/respuesta");
+var Respuesta = require("../../server/helpers/response");
 var SegUsuarioDao = require("../../seguridad_api/dao/segUsuarioDao")
 var CliClienteDao = require("../../ventas_api/dao/cliClienteDao");
 var GenPersonaDao = require("../../general_api/dao/genPersonaDao");

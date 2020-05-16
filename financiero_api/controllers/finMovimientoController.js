@@ -67,10 +67,7 @@ var create = function(req, res) {
             error: error
         });
     });
-
 };
-
-
 // =============================================
 //  Permite actualizar la informacion de una 
 //  cliente ya registrado
@@ -124,7 +121,7 @@ var update = async (req, res) => {
         return;
     }
     let consulta3 =await GenPersonaDao.findByIdentificacion(cliente.identificacion).then((resultado) => {
-        console.log("resultado",resultado,cliente)
+               
         if(resultado){
             if (resultado.dataValues.id_persona!=cliente.id_persona) {
                 console.log(resultado.dataValues.id_persona!=cliente.id_persona);

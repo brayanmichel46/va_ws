@@ -13,6 +13,16 @@ var findAll = async function(desde) {
             {
                 model:Models.GenPersona,
                 attributes:['nombre']
+            },
+            {
+                model:Models.SegRoleUsuario,
+            //attributes:['id_role'],
+               include:[
+                    {
+                        model:Models.SegRole,
+                          attributes:['descripcion']
+                    }
+                ]   
             }
         ]
     });
@@ -68,7 +78,7 @@ var  update = async (usuario)  => {
     usu.dataValues.nombre=usu.dataValues.GenPersona.nombre;
     delete usu.dataValues.GenPersona;
     return usu;
-    console.log("entro", objetoActualizar);
+
     
 };
 // =============================================
@@ -123,6 +133,31 @@ var findByIdPersona = function(id_persona) {
 var findAndCountAll = () => {
     return Models.SegUsuario.count({});
 }
+
+// =============================================
+// Funcion que permite desactivar un usuario
+// =============================================
+var  desactivarUsuario = async (id_usuario)  => {
+    Models.SegUsuario.update({
+        estado:'I'
+    }, {
+        where: {
+            id_usuario: id_usuario
+        }
+    });
+}
+// =============================================
+// Funcion que permite activar un usuario
+// =============================================
+var  activarUsuario = async (id_usuario)  => {
+    Models.SegUsuario.update({
+        estado:'A'
+    }, {
+        where: {
+            id_usuario: id_usuario
+        }
+    });
+}
 module.exports.findAll = findAll;
 module.exports.create = create;
 module.exports.update = update;
@@ -131,3 +166,5 @@ module.exports.findById = findById;
 module.exports.findByEmail = findByEmail;
 module.exports.findByIdPersona = findByIdPersona;
 module.exports.findAndCountAll = findAndCountAll;
+module.exports.desactivarUsuario = desactivarUsuario;
+module.exports.activarUsuario = activarUsuario;

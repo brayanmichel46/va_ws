@@ -69,14 +69,14 @@ var createPersonaCliente = (persona, cliente) => {
         return sequelize.transaction({ autocommit: false }).then(function(t) {
             Models.GenPersona.create(persona, { transaction: t }).then(function(personac) {
                 cliente.id_persona = personac.id_persona;
-                Models.CliCliente.create(cliente, { transaction: t }).then(function(clientec) {
-                    t.commit();
+                Models.CliCliente.create(cliente, { transaction: t }).then(function(clientec) {                    
                     datos = {
                         persona: personac,
-                        cliente: usuarioc
+                        cliente: clientec
                     }
+                    t.commit();
                     deferred.resolve(datos);
-                }).catch(function(error) {
+                }).catch(function(error) {   
                     t.rollback();
                     deferred.reject(error);
                 });

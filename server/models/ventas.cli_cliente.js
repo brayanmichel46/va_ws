@@ -12,11 +12,11 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
         direccion: {
-            type: DataTypes.STRING(200),
+            type: DataTypes.STRING(250),
             allowNull: true
         },
         email: {
-            type: DataTypes.STRING(100),
+            type: DataTypes.STRING(140),
             allowNull: true
         },
         celular: {

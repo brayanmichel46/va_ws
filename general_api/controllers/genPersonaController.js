@@ -124,12 +124,14 @@ var createPersonaCliente = function(req, res) {
 
         } else {
             GenPersonaDao.createPersonaCliente(persona, cliente).then(function(resultado) {
-                Respuesta.sendJsonResponse(res, 201, {
+                Respuesta.sendJsonResponse(res, 201, {                    
                     ok: true,
                     mensaje: 'persona y cliente creado',
                     datos: resultado
                 });
             }).catch(function(error) {
+                console.log("this is error!!",error,req.body);
+
                 Respuesta.sendJsonResponse(res, 500, {
                     ok: false,
                     mensaje: 'Error al crear la persona y el cliente',

@@ -1,6 +1,6 @@
 var jwt = require('jsonwebtoken');
 var SEED = require('../config/config').SEED;
-var Respuesta = require("../helpers/respuesta");
+var Respuesta = require("../helpers/response");
 
 /*
  ********************************

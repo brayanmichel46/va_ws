@@ -38,6 +38,14 @@ app.post('/actualizarusuario', mdAutenticacion.verificaToken, SegUsuarioControll
 //  Borrar un usuario
 // =============================================
 app.post('/eliminarusuario', mdAutenticacion.verificaToken, SegUsuarioController.delete);
+// =============================================
+//  Desactivar un usuario
+// =============================================
+app.post('/desactivarusuario', mdAutenticacion.verificaToken, SegUsuarioController.desactivarUsuario);
+// =============================================
+//  Activar un usuario
+// =============================================
+app.post('/activarusuario', mdAutenticacion.verificaToken, SegUsuarioController.activarUsuario);
 
 /*
  ****************************************

@@ -34,7 +34,9 @@ var findAll = function(req, res) {
         });
 
     }).catch(function(error) {
+        console.log('error',error)
         Respuesta.sendJsonResponse(res, 500, {
+           
             ok: false,
             mensaje: 'Error al consultar los usuarios',
             errors: error
@@ -76,18 +78,20 @@ var create = function(req, res) {
 // =============================================
 var update = async (req, res) => {
     var usuario = req.body;
+    let consulta1;
     console.log('usuario',usuario);
     if(Object.keys(usuario).indexOf('email')>0){
-        await SegUsuarioDao.findByEmail(usuario.email).then((usuarioemail)=>{
+        consullta1 = await SegUsuarioDao.findByEmail(usuario.email).then((usuarioemail)=>{
             //console.log("usuario",usuarioemail.dataValues);
             if(usuarioemail){
-                return Respuesta.sendJsonResponse(res, 400, {
+                 Respuesta.sendJsonResponse(res, 400, {
                     ok: false,
                     mensaje: 'El email ya esta en uso',
                     erros: { message: 'Existe un usuario con este email' }
                 });
+                return 1;
             }
-
+            
         }).catch((error) => {
             console.log("error",error)
             Respuesta.sendJsonResponse(res, 500, {
@@ -97,7 +101,9 @@ var update = async (req, res) => {
             });    
         })
     }
-
+    if(consulta1==1){
+        return;
+    }
         SegUsuarioDao.findById(usuario.id_usuario).then((resultado) => {
             if (!resultado) {
                 Respuesta.sendJsonResponse(res, 400, {
@@ -339,6 +345,82 @@ var crearUsuarioWeb = function(req, res) {
 
 };
 
+
+
+// =============================================
+//  Permite desactivar un usuario desde la web
+// =============================================
+var desactivarUsuario = function(req, res) {
+    var usuario=req.body;
+    SegUsuarioDao.findById(usuario.id_usuario).then((resultado) => {
+        if (!resultado) {
+            Respuesta.sendJsonResponse(res, 400, {
+                ok: false,
+                mensaje: 'El usuario con el id ' + usuario.id_usuario + ' no existe',
+                erros: { message: 'No existe un usuario con ese ID' }
+            });
+        };
+        SegUsuarioDao.desactivarUsuario(usuario.id_usuario).then((resultado) => {
+
+            Respuesta.sendJsonResponse(res, 200, {
+                ok: true,
+                mensaje: 'Usuario desactivado!',
+                usuario: resultado
+            });
+        }).catch((error) => {
+            Respuesta.sendJsonResponse(res, 400, {
+                ok: false,
+                mensaje: 'Error al desactivar el usuario',
+                usuario: error
+            });
+        });
+    }).catch((error) => {
+       
+        Respuesta.sendJsonResponse(res, 500, {
+            ok: false,
+            mensaje: 'Error al buscar usuario',
+            error: error
+        });
+    })
+}
+
+// =============================================
+//  Permite activar un usuario desde la web
+// =============================================
+var activarUsuario = function(req, res) {
+    var usuario=req.body;
+    SegUsuarioDao.findById(usuario.id_usuario).then((resultado) => {
+        if (!resultado) {
+            Respuesta.sendJsonResponse(res, 400, {
+                ok: false,
+                mensaje: 'El usuario con el id ' + usuario.id_usuario + ' no existe',
+                erros: { message: 'No existe un usuario con ese ID' }
+            });
+        };
+        SegUsuarioDao.desactivarUsuario(usuario.id_usuario).then((resultado) => {
+            
+            Respuesta.sendJsonResponse(res, 200, {
+                ok: true,
+                mensaje: 'Usuario desactivado!',
+                usuario: resultado
+            });
+        }).catch((error) => {
+            Respuesta.sendJsonResponse(res, 400, {
+                ok: false,
+                mensaje: 'Error al desactivar el usuario',
+                usuario: error
+            });
+        });
+    }).catch((error) => {
+      
+        Respuesta.sendJsonResponse(res, 500, {
+            ok: false,
+            mensaje: 'Error al buscar usuario',
+            error: error
+        });
+    })
+}
+
 module.exports.findAll = findAll;
 module.exports.create = create;
 module.exports.update = update;
@@ -346,3 +428,5 @@ module.exports.delete = eliminar;
 module.exports.login = login;
 module.exports.loginGoogle = loginGoogle;
 module.exports.crearUsuarioWeb=crearUsuarioWeb;
+module.exports.desactivarUsuario=desactivarUsuario;
+module.exports.activarUsuario=activarUsuario;

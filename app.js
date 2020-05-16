@@ -26,6 +26,8 @@ var appRoutes = require('./va_api/routes/index');
 var appRoutesSeguridad = require('./seguridad_api/routes/index');
 var appRoutesGeneral = require('./general_api/routes/index');
 var appRoutesVentas = require('./ventas_api/routes/index');
+var appRoutesFinanciero = require('./financiero_api/routes/index');
+var appRoutesInventario = require('./inventario_api/routes/index');
 
 
 
@@ -37,7 +39,9 @@ app.listen(3000, () => {
 // Rutas
 app.use('/seguridad', appRoutesSeguridad);
 app.use('/general', appRoutesGeneral);
+app.use('/inventario', appRoutesInventario);
 app.use('/ventas', appRoutesVentas);
+app.use('/financiero', appRoutesFinanciero);
 app.use('/va', appRoutes);
 
 module.exports = app;

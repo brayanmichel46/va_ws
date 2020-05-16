@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey: true,
             autoIncrement: true
         },
-        id_rol: {
+        id_role: {
             type: DataTypes.BIGINT,
             allowNull: false
         },
@@ -21,12 +21,16 @@ module.exports = (sequelize, DataTypes) => {
         underscored: true,
         freezeTableName: true,
         schema: 'seguridad',
-        classMethods: {
+       /*  classMethods: {
             associate: function(models) {
-                models.SegRoleUsuario.belongsTo(models.SegUsuario, { foreignKey: 'id_usuario' });
                 models.SegRoleUsuario.belongsTo(models.SegRole, { foreignKey: 'id_role' });
+                models.SegRoleUsuario.belongsTo(models.SegUsuario, { foreignKey: 'id_usuario' });                
             }
-        },
+        }, */
     });
+    SegRoleUsuario.associate = function(models) {
+        SegRoleUsuario.belongsTo(models.SegRole, { foreignKey: 'id_role' });
+        SegRoleUsuario.belongsTo(models.SegUsuario, { foreignKey: 'id_usuario' });  
+    };
     return SegRoleUsuario;
 }
