@@ -16,11 +16,47 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
         id_estado: {
-            type: DataTypes.DATE,
+            type: DataTypes.INTEGER,
             allowNull: false
         },
+        totales:{
+            type:DataTypes.JSON,
+            allowNull:false
+        },
+        items:{
+            type:DataTypes.JSON,
+            allowNull:false
+        },
+        saldo:{
+            type:DataTypes.DECIMAL(20,2),
+            allowNull:false
+        },
+        total:{
+            type:DataTypes.DECIMAL(20,2),
+            allowNull:false
+        },
+        transporte:{
+            type:DataTypes.DECIMAL(20,2),
+            allowNull:false
+        },
+        descuento:{
+            type:DataTypes.DECIMAL(20,2),
+            allowNull:false
+        },
+        saldo:{
+            type:DataTypes.DECIMAL(20,2),
+            allowNull:false
+        },
+        fec_factura:{
+            type:DataTypes.DATE,
+            allowNull:false
+        },
+        num_factura:{
+            type:DataTypes.STRING(50),
+            allowNull:false
+        }
     }, {
-        tableName: 'fin_movimiento',
+        tableName: 'fin_factura',
         timestamps: false,
         underscored: true,
         freezeTableName: true,

@@ -31,6 +31,10 @@ module.exports = (sequelize, DataTypes) => {
             type:DataTypes.STRING(30),
             allowNull:false
         },
+        maximos_p:{
+            type:DataTypes.JSON,
+            allowNull:false
+        },
         id_gupo:{
             type:DataTypes.INTEGER,
             allowNull:false
@@ -51,6 +55,8 @@ module.exports = (sequelize, DataTypes) => {
         InvInventario.hasMany(models.InvInvSuc, { foreignKey: 'id_inventario' });
         InvInventario.belongsTo(models.ParFormula, { foreignKey: 'id_formula' });
         InvInventario.belongsTo(models.GenUniMedida, { foreignKey: 'id_uni_medida' });
+        InvInventario.hasMany(models.InvInvCom,{foreignKey:'id_inventario'});
+        InvInventario.belongsTo(models.InvGrupo, { foreignKey: 'id_grupo' });
     };
     return InvInventario;
 };

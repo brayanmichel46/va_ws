@@ -11,27 +11,13 @@ var jwt = require("jsonwebtoken");
 
 var mdAutenticacion = require("../../server/middlewares/autenticacion");
 var FinDetFacturaController = require("../controllers/finDetFacturaController");
-
-
+var FinFacturaController = require("../controllers/finFacturaController");
 
 /*
  ********************************
- ***     RUTAS CLIENTE       ***
+ RUTAS DETALLE FACTURA
  ********************************
  */
-
-// =============================================
-//  Obtener todos los clientes
-// =============================================
-//app.post("/obtenerclientes", mdAutenticacion.verificaToken, genClienteController.findAll);
-// =============================================
-//  Crear una nueva cliente
-// =============================================
-//app.post('/crearcliente', mdAutenticacion.verificaToken, genClienteController.create);
-// =============================================
-//  Actualizar cliente
-// =============================================
-//app.post('/actualizarcliente', mdAutenticacion.verificaToken, genClienteController.update);
 
 /**
  * RUTA QUE PERMITE OBTENER EL PRECIO
@@ -42,4 +28,29 @@ app.post(
   mdAutenticacion.verificaToken,
   FinDetFacturaController.calcularPreciosItemsFactura
 );
+/*
+ ********************************
+ RUTAS FACTURA
+ ********************************
+ */
+/**
+ * RUTA QUE PERMITE GUARDAR UNA
+ * FACTURA
+ */
+app.post(
+  "/guardarfactura",
+  mdAutenticacion.verificaToken,
+  FinFacturaController.guardarFactura
+);
+/**
+ * RUTA QUE PERMITE OBTENER UNA
+ * FACTURA
+ */
+app.post(
+  "/obtenerfactura",
+  mdAutenticacion.verificaToken,
+  FinFacturaController.obtenerFactura
+);
+
+
 module.exports = app;

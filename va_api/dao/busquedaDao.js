@@ -128,7 +128,10 @@ var findAllInvSucursal = async function (busqueda) {
           "id_uni_medida",
           "id_formula",
           "nesecita_p",
-          "codigo"
+          "codigo",
+          "id_grupo",
+          "maximos_p",
+          'id_grupo'
         ],
         where: {
           [Op.or]: [
@@ -149,18 +152,56 @@ var findAllInvSucursal = async function (busqueda) {
             model: Models.GenUniMedida,
             attributes: ["unidad", "n_parametros"],
           },
+          {
+            model: Models.InvGrupo,
+            attributes: ["cambio"],
+          },
+          {
+            model:Models.InvInvCom,
+            attributes:["id_inv_com","id_componente"],
+            include:[{
+              model: Models.InvInventario,
+              as:"componente",
+              attributes:["id_formula","id_inventario","maximos_p"],
+              include:[
+                {
+                  model:Models.InvInvSuc,
+                  where:{
+                    id_sucursal:1
+                  }
+                  /* where:sequelize.literal(
+                    '"InvInventario->InvInvComs->componente->InvInvSucs"."id_sucursal"=1'
+                    
+                  ) */
+                },
+                
+              ],
+
+            }],
+           
+          }
         ],
       },
     ],
   });
 
   await resultado.forEach(async (element) => {
-    element.dataValues.descripcion = element.dataValues.InvInventario.descripcion,
-    element.dataValues.codigo = element.dataValues.InvInventario.codigo,
-    element.dataValues.id_formula = element.dataValues.InvInventario.id_formula,
-    element.dataValues.nesecita_p = element.dataValues.InvInventario.nesecita_p,
-    element.dataValues.unidad = element.dataValues.InvInventario.GenUniMedida.unidad,
-    element.dataValues.n_parametros = element.dataValues.InvInventario.GenUniMedida.n_parametros,
+    element.dataValues.descripcion = element.dataValues.InvInventario.descripcion;
+    element.dataValues.codigo = element.dataValues.InvInventario.codigo;
+    element.dataValues.id_formula = element.dataValues.InvInventario.id_formula;
+    element.dataValues.nesecita_p = element.dataValues.InvInventario.nesecita_p;
+    element.dataValues.id_grupo = element.dataValues.InvInventario.id_grupo;
+    element.dataValues.maximos_p = element.dataValues.InvInventario.maximos_p;
+    element.dataValues.unidad = element.dataValues.InvInventario.GenUniMedida.unidad;
+    element.dataValues.n_parametros = element.dataValues.InvInventario.GenUniMedida.n_parametros;
+    element.dataValues.cambio=element.dataValues.InvInventario.InvGrupo.dataValues.cambio;     
+    var componentes=[]
+    await element.dataValues.InvInventario.InvInvComs.forEach(element2 => {
+      element2.componente.dataValues.vr_venta=element2.componente.InvInvSucs[0].vr_venta_local;
+      delete element2.componente.InvInvSuc;
+      componentes.push(element2.componente);      
+    }); 
+    element.dataValues.Componentes=componentes;
     delete element.dataValues.InvInventario;
   });
   return resultado;
