@@ -34,28 +34,30 @@ var obtenerInventarioSucursal = async function (desde) {
           "descripcion",
           "id_uni_medida",
           "id_formula",
-          "nesecita_p"
+          "nesecita_p",
         ],
-        include:[
-            {
-                model: Models.GenUniMedida,
-                attributes:[
-                    'unidad',
-                    'n_parametros'
-                ]
-            }
-        ]
-      },      
+        include: [
+          {
+            model: Models.GenUniMedida,
+            attributes: ["unidad", "n_parametros"],
+          },
+        ],
+      },
     ],
   });
   console.log(respuesta);
 
   await respuesta.forEach(async (element) => {
-    element.dataValues.descripcion = element.dataValues.InvInventario.descripcion,
-    element.dataValues.id_formula = element.dataValues.InvInventario.id_formula,
-    element.dataValues.nesecita_p = element.dataValues.InvInventario.nesecita_p,
-    element.dataValues.unidad = element.dataValues.InvInventario.GenUniMedida.unidad,
-    element.dataValues.n_parametros = element.dataValues.InvInventario.GenUniMedida.n_parametros
+    (element.dataValues.descripcion =
+      element.dataValues.InvInventario.descripcion),
+      (element.dataValues.id_formula =
+        element.dataValues.InvInventario.id_formula),
+      (element.dataValues.nesecita_p =
+        element.dataValues.InvInventario.nesecita_p),
+      (element.dataValues.unidad =
+        element.dataValues.InvInventario.GenUniMedida.unidad),
+      (element.dataValues.n_parametros =
+        element.dataValues.InvInventario.GenUniMedida.n_parametros);
     //delete element.dataValues.InvInventario.GenUniMedida;
     delete element.dataValues.InvInventario;
   });
@@ -66,6 +68,37 @@ var count = () => {
   return Models.InvInvSuc.count({});
 };
 
+var update = async (inventario) => {
+  console.log(inventario);
+  let objetoUpdate = {};
+
+  if (inventario.costo_promedio) {
+    objetoUpdate.costo_promedio = inventario.costo_promedio;
+  }
+  if (inventario.vr_venta_domicilio) {
+    objetoUpdate.vr_venta_domicilio = inventario.vr_venta_domicilio;
+  }
+  if (inventario.vr_venta_local) {
+    objetoUpdate.vr_venta_local = inventario.vr_venta_local;
+  }
+  let inv = await Models.InvInvSuc.update(objetoUpdate, {
+    where: {
+      id_inv_suc: inventario.id_inv_suc,
+    },
+  });
+
+  return inv;
+};
+
+var findById = (id_inv_suc) => {
+  return Models.InvInvSuc.find({
+    where: {
+      id_inv_suc: id_inv_suc,
+    },
+  });
+};
+
 module.exports.obtenerInventarioSucursal = obtenerInventarioSucursal;
 module.exports.count = count;
-
+module.exports.update = update;
+module.exports.findById = findById;

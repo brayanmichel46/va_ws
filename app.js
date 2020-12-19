@@ -3,6 +3,7 @@ var express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
 
+
 // Inicializar variables
 var app = express();
 
@@ -18,8 +19,10 @@ app.use(function(req, res, next) {
   });
 
 // Parse incoming requests data (https://github.com/expressjs/body-parser)
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+//app.use(bodyParser.json());
+//app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json({limit: '50mb'}));
+app.use(express.urlencoded({limit: '50mb'}));
 
 // Importar rutas
 var appRoutes = require('./va_api/routes/index');
@@ -32,7 +35,8 @@ var appRoutesInventario = require('./inventario_api/routes/index');
 
 
 // Escuchar peticiones
-app.listen(3000,"192.168.1.49", () => {
+app.listen(3000,"192.168.1.57", () => {
+//app.listen(3000, () => {
     console.log('Express server puerto 3000: \x1b[32m%s\x1b[0m', 'online');
 });
 

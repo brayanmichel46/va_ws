@@ -22,10 +22,34 @@ var ParFormulaDao = require("../../general_api/dao/parFormulaDao");
  * @param {Object} res - Objeto de respuesta de express
  **/
 var calcularPreciosItemsFactura = async function (req, res) {
-  console.log("req", req.body); 
-  var ids_formulas = [];
   var itemsFactura = req.body.itemsFactura;
   var datosGenerales = req.body.datosGenerales;
+  let result = await calcularPreciosItemsFacturaServidor(itemsFactura,datosGenerales,res);
+  if(result){
+    Respuesta.sendJsonResponse(res, 200, {
+      ok: true,
+      mensaje: "Exito",
+      itemsFactura: result.itemsFactura,
+      totales: result.totales,
+    });
+  }else{
+    Respuesta.sendJsonResponse(res, 500, {
+      ok: false,
+      mensaje: "Error al calcular los valores",
+      cliente: error,
+    });
+  }
+};
+
+/**
+ * Funccion que permite calcular el precio de cada uno de los items
+ * de una factura en el servidor
+ * @param {Object} itemsFactura - Objeto que contine los items de una factura
+ * @param {Object} datosGenerales - Objeto que contine los datos generales de una factura
+ * @param {Object} res - Objeto de respuesta de express
+ **/
+var calcularPreciosItemsFacturaServidor = async function (itemsFactura,datosGenerales,res) {
+  var ids_formulas = [];
   var formulas;
   var mayorVr = itemsFactura[0];
   var totales = {
@@ -34,17 +58,15 @@ var calcularPreciosItemsFactura = async function (req, res) {
     vr_antes_iva: 0.0,
     vr_iva: 0.0,
     total: 0.0,
-    cantidad_items: 0,
+    cantidad_items: 0
   };
-
-  await itemsFactura.forEach(async (element) => {
-    //console.log("item",element);
+  for (const element of itemsFactura) {
     if (!ids_formulas.includes(element.id_formula)) {
       ids_formulas.push(element.id_formula);
     }
-    await element.Componentes.forEach(async (element2) => {
+    for (const element2 of element.Componentes) {
       ids_formulas.push(element2.id_formula);
-    });
+    }
     element.vr_descuento = 0;
     element.vr_antes_iva = 0;
     element.vr_iva = 0;
@@ -53,7 +75,8 @@ var calcularPreciosItemsFactura = async function (req, res) {
     totales.cantidad_items = parseFloat(
       totales.cantidad_items + parseFloat(element.cantidad_item)
     );
-  });
+  }
+
   totales.vr_transporte_item = parseFloat(
     (parseFloat(datosGenerales.transporte) / totales.cantidad_items).toFixed(2)
   );
@@ -66,11 +89,9 @@ var calcularPreciosItemsFactura = async function (req, res) {
     ).toFixed(2)
   );
   totales.transporte = parseFloat(datosGenerales.transporte);
-  /* console.log("IDs formulas", ids_formulas); */
 
   await ParFormulaDao.obtenerFormulaId(ids_formulas)
     .then((resultado) => {
-      /*   console.log(resultado); */
       formulas = JSON.parse(JSON.stringify(resultado));
     })
     .catch((error) => {
@@ -81,9 +102,8 @@ var calcularPreciosItemsFactura = async function (req, res) {
       });
     });
 
-  await formulas.forEach(async (element1) => {
-    /* console.log("formulas",element1); */
-    await itemsFactura.forEach(async (element2) => {
+  for (const element1 of formulas) {
+    for (const element2 of itemsFactura) {
       if (element1.id_formula == element2.id_formula) {
         element2.formula = element1.formula;
         element2.vr_transporte = parseFloat(
@@ -92,28 +112,27 @@ var calcularPreciosItemsFactura = async function (req, res) {
           ).toFixed(2)
         );
       }
-      await element2.Componentes.forEach((element3) => {
+      for (const element3 of element2.Componentes) {
         if (element1.id_formula == element3.id_formula) {
           element3.formula = element1.formula;
         }
-      });
-    });
-  });
-  //console.log(itemsFactura[0].Componentes);
-  await itemsFactura.forEach((element) => {
+      }
+    }
+  }
+
+  for (const element of itemsFactura) {
     eval(element.formula);
     if (mayorVr.sub_total < element.sub_total) {
       mayorVr = element;
     }
-  });
+  }
   pos = itemsFactura.indexOf(mayorVr);
-  if(pos>1){
+  if (pos >= 0) {
     itemsFactura[pos].vr_transporte = parseFloat(
       (itemsFactura[pos].vr_transporte + totales.ajuste_transporte).toFixed(2)
     );
   }
-  
-  await itemsFactura.forEach((element) => {
+  for (const element of itemsFactura) {
     element.vr_descuento = parseFloat(
       (
         element.sub_total *
@@ -146,53 +165,10 @@ var calcularPreciosItemsFactura = async function (req, res) {
     );
     totales.vr_iva = parseFloat((totales.vr_iva + element.vr_iva).toFixed(2));
     totales.total = parseFloat((totales.total + element.total).toFixed(2));
-  });
-  /* totales.ajuste_total = parseFloat(
-    (Math.ceil(totales.total / 100) * 100 - totales.total).toFixed(2)
-  );
-  totales.ajuste_item = parseFloat(
-    (totales.ajuste_total / totales.cantidad_items).toFixed(2)
-  );
-  totales.ajuste_final = parseFloat(
-    (
-      totales.ajuste_total -
-      parseFloat((totales.ajuste_item * totales.cantidad_items).toFixed(2))
-    ).toFixed(2)
-  ); */
-  var v = 0;
-  var v2 = 0;
-
-  await itemsFactura.forEach((element) => {
-    /*  if(mayorVr.total<element.total){
-      mayorVr=element;
-    } */
-    /* element.total = parseFloat(
-      (
-        element.total +
-        parseFloat((totales.ajuste_item * element.cantidad_item).toFixed(2))
-      ).toFixed(2)
-    ); */
-    //v+=element.total;
-    //console.log(element.total);
-  });
-  /* itemsFactura[pos].total = parseFloat(
-    (itemsFactura[pos].total + totales.ajuste_final).toFixed(2)
-  );
-  totales.total = parseFloat((totales.total + totales.ajuste_total).toFixed(2)); */
-  await itemsFactura.forEach((element) => {
-    v += element.total;
-    v2 += element.vr_transporte;
-    /* console.log(element.total);
-    console.log(element.vr_transporte); */
-  });
-  /* console.log(totales,parseFloat(v.toFixed(2)),parseFloat(v2.toFixed(2))); */
-
-  Respuesta.sendJsonResponse(res, 200, {
-    ok: true,
-    mensaje: "Exito",
-    itemsFactura: itemsFactura,
-    totales: totales,
-  });
+  }
+  return {itemsFactura:itemsFactura,totales:totales};
 };
 
 module.exports.calcularPreciosItemsFactura = calcularPreciosItemsFactura;
+module.exports.calcularPreciosItemsFacturaServidor=calcularPreciosItemsFacturaServidor;
+

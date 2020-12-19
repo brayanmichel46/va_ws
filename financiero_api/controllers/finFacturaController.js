@@ -20,35 +20,44 @@ const { response } = require("express");
  * @param {Object} req - Objeto de petición de express
  * @param {Object} res - Objeto de respuesta de express
  **/
-var guardarFactura = function (req, res) {
+var guardarFactura = async function (req, res) {
   var itemsFactura = req.body.itemsFactura;
   var id_cliente = req.body.cliente;
   var datosGenerales = req.body.datosGenerales;
-  var totales = req.body.totales;
-  console.log(req.body);
-  FinFacturaDao.guardarFactura(
-    id_cliente,
+  let result = await FinFacturaController.calcularPreciosItemsFacturaServidor(
     itemsFactura,
     datosGenerales,
-    totales
-  )
-    .then((resultado) => {
-      return Respuesta.sendJsonResponse(res, 200, {
-        ok: true,
-        message: "!Factura creada con exito!",
-        result: resultado,
+    res
+  );
+  if (result) {
+    FinFacturaDao.guardarFactura(
+      id_cliente,
+      result.itemsFactura,
+      datosGenerales,
+      result.totales
+    )
+      .then((resultado) => {
+        return Respuesta.sendJsonResponse(res, 200, {
+          ok: true,
+          message: "!Factura creada con exito!",
+          result: resultado,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        Respuesta.sendJsonResponse(res, 500, {
+          ok: false,
+          mensaje: "Error al crear la factura",
+          cliente: error,
+        });
       });
-    })
-    .catch((error) => {
-      console.log(error);
-      Respuesta.sendJsonResponse(res, 500, {
-        ok: false,
-        mensaje: "Error al crear la factura",
-        cliente: error,
-      });
+  } else {
+    Respuesta.sendJsonResponse(res, 500, {
+      ok: false,
+      mensaje: "Error al calcular los valores",
     });
+  }
 };
-
 /**
  * Funccion que permite consultar una factura por su id
  * @param {Object} req - Objeto de petición de express
@@ -72,6 +81,52 @@ var obtenerFactura = function (req, res) {
       });
     });
 };
-
+/**
+ * Funccion que permite realizar un pago a una factura
+ * por su id
+ * @param {Object} req - Objeto de petición de express
+ * @param {Object} res - Objeto de respuesta de express
+ **/
+var agregarPagoFacturaId = function (req, res) {
+  let abono = req.body.abono;
+  FinFacturaDao.agregarPagoFacturaId(abono)
+    .then((result) => {
+      console.log("dsfasdfasdfasdfaswd", result);
+      return Respuesta.sendJsonResponse(res, 200, {
+        ok: true,
+        message: "!Pago realizado con exito!",
+        result: result,
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+      Respuesta.sendJsonResponse(res, 500, {
+        ok: false,
+        mensaje: "Error al realizar el pago",
+      });
+    });
+};
+var obtenerFacturas = function (req, res) {
+  var desde = req.body.desde;
+  FinFacturaDao.obtenerFacturas(desde)
+    .then(function (result) {
+      Respuesta.sendJsonResponse(res, 200, {
+        ok: true,
+        mensaje: "Facturas obtenidas con exito",
+        facturas: result.facturas,
+        total: result.count,
+      });
+    })
+    .catch(function (error) {
+      console.log("error", error);
+      Respuesta.sendJsonResponse(res, 500, {
+        ok: false,
+        mensaje: "Error al consultar facturas",
+        errors: error,
+      });
+    });
+};
 module.exports.guardarFactura = guardarFactura;
 module.exports.obtenerFactura = obtenerFactura;
+module.exports.agregarPagoFacturaId = agregarPagoFacturaId;
+module.exports.obtenerFacturas = obtenerFacturas;

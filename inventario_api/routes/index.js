@@ -11,7 +11,7 @@ var app = express();
 var jwt = require("jsonwebtoken");
 
 var mdAutenticacion = require("../../server/middlewares/autenticacion");
-var InvInvSuc = require("../controllers/invInvSucController");
+var invInvSucController = require("../controllers/invInvSucController");
 
 /*
  ************************************************
@@ -25,8 +25,18 @@ var InvInvSuc = require("../controllers/invInvSucController");
  */
 app.post(
   "/obtenerinventariosucursal",
-  //mdAutenticacion.verificaToken,
-  InvInvSuc.obtenerInventarioSucursal
+  mdAutenticacion.verificaToken,
+  invInvSucController.obtenerInventarioSucursal
+);
+
+/**
+ * RUTA QUE PERMITE ACTUALIZAR LOS
+ * VALORES DE UN INVENTARIO
+ */
+app.post(
+  "/actualizarinventario",
+  mdAutenticacion.verificaToken,
+  invInvSucController.update
 );
 
 module.exports = app;

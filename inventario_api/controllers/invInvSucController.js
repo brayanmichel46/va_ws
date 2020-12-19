@@ -46,5 +46,46 @@ var obtenerInventarioSucursal = function(req, res) {
         });
     });
 };
-
+/**
+ * Function que permite actualizar los datos de un inventario
+ * @param {Object} req - Objeto de petición de express
+ * @param {Object} res - Objeto de respuesta de express
+ **/
+var update = async (req, res) => {
+    var inventario = req.body.inventario;
+    InvInvSucDao.findById(inventario.id_inv_suc).then((resultado) => {
+        if (!resultado) {
+            Respuesta.sendJsonResponse(res, 400, {
+                ok: false,
+                mensaje: 'El inventario con el id ' + inventario.id_inv_suc + ' no existe',
+                erros: { message: 'No existe un cliente con ese ID' }
+            });            
+        }else{
+            InvInvSucDao.update(inventario).then((resultado) => {
+       
+                return Respuesta.sendJsonResponse(res, 200, {
+                   ok: true,
+                   mensaje: 'inventario actualizado!',
+                   inventario: resultado
+               });
+           }).catch((error) => {
+               console.log(error);
+               Respuesta.sendJsonResponse(res, 400, {
+                   ok: false,
+                   mensaje: 'Error al actualizar el inventario',
+                   cliente: error
+               });
+           });
+        }
+       
+    }).catch((error) => {
+        console.log(error);
+        Respuesta.sendJsonResponse(res, 500, {
+            ok: false,
+            mensaje: 'Error al buscar inventario',
+            error: error
+        });
+    });
+};
 module.exports.obtenerInventarioSucursal = obtenerInventarioSucursal;
+module.exports.update=update;

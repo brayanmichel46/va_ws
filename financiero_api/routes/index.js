@@ -51,6 +51,23 @@ app.post(
   mdAutenticacion.verificaToken,
   FinFacturaController.obtenerFactura
 );
-
+/**
+ * RUTA QUE PERMITE REALIZAR UN PAGO A UNA
+ * FACTURA
+ */
+app.post(
+  "/agregarPagoFacturaId",
+  mdAutenticacion.verificaToken,
+  FinFacturaController.agregarPagoFacturaId
+);
+/**
+ * RUTA QUE PERMITE OBTENER EL LISTADO DE 
+ * FACTURAS DE UNA SUCURSAL
+ */
+app.post(
+  "/obtenerfacturas",
+  mdAutenticacion.verificaToken,
+  FinFacturaController.obtenerFacturas
+);
 
 module.exports = app;

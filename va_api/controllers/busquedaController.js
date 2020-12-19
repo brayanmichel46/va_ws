@@ -43,7 +43,10 @@ var busquedaColeccion = (req, res) => {
       promesa = BusquedaDao.findAllPersonas(busqueda);
       break;
     case "inv_sucursal":
-      promesa = BusquedaDao.findAllInvSucursal(busqueda);
+      promesa = BusquedaDao.findAllInvSucursal(busqueda, req.body.desde);
+      break;
+    case "facturas":
+      promesa = BusquedaDao.findAllFacturas(busqueda, req.body.desde);
       break;
     default:
       Respuesta.sendJsonResponse(res, 400, {

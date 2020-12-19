@@ -270,7 +270,7 @@ var mejorCorteLineal = function (array, unique, maximos_p,max_desperdicio,desper
       mejorOpcion=element;
     }
   });
-
+  console.log("opciones",mejorOpcion);
   return { mejorOpcion:mejorOpcion,opciones: opciones };
 };
 //let p = [110, 50, 110, 115,50, 130, 120, 48, 49, 300,22,600];

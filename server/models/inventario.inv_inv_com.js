@@ -14,7 +14,19 @@ module.exports = (sequelize, DataTypes) => {
         id_componente:{
             type:DataTypes.INTEGER,
             allowNull:false
-        }        
+        },
+        seleccionar:{
+            type:DataTypes.CHAR(1),
+            allowNull:false
+        },
+        detalle:{
+            type:DataTypes.STRING(50),
+            allowNull:false
+        },
+        seleccionado:{
+            type:DataTypes.BOOLEAN,
+            allowNull:false
+        }
     }, {
         tableName: 'inv_inv_com',
         timestamps: false,

@@ -65,8 +65,8 @@ module.exports = (sequelize, DataTypes) => {
     FinFactura.associate = function(models) {
         FinFactura.belongsTo(models.FinMovimiento, { foreignKey: 'id_movimiento' });
         FinFactura.belongsTo(models.CliCliente, { foreignKey: 'id_cliente' });            
-        FinFactura.hasMany(models.FinFactura, { foreignKey: 'id_factura' });
-
+        FinFactura.hasMany(models.FinAboFac, { foreignKey: 'id_factura' });
+        FinFactura.belongsTo(models.GenEstado, { foreignKey: 'id_estado' });
     };
     return FinFactura;
 };
