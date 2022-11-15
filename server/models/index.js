@@ -11,8 +11,17 @@ var db = {};
 
 if (config.use_env_variable) {
     var sequelize = new Sequelize(process.env[config.use_env_variable], config);
+    
+    console.log("aqui1")
 } else {
     var sequelize = new Sequelize(config.database, config.username, config.password, config);
+    console.log(config)
+    sequelize.authenticate().then(() => {
+        console.log('Connection has been established successfully.');
+     }).catch((error) => {
+        console.error('Unable to connect to the database: ', error);
+     });
+    console.log("aqui2")
 }
 
 fs
